@@ -1,15 +1,15 @@
 export default class ColumnChart {
-  constructor(params) {
-    const defaultParams = {
-      data: [],
-      label: '',
-      link: '',
-      value: 0,
-      formatHeading: null
-    };
-    this.options = {...defaultParams, ...params};
+  constructor({
+    data = [],
+    label = '',
+    link = '',
+    value = 0,
+    formatHeading = data => data
+  } = {}
+  ) {
 
-    this.isLoading = !params || this.options.data.length === 0;
+    this.options = arguments[0] || {};
+    this.isLoading = !arguments[0] || !this.options.data || this.options.data.length === 0;
     this.chartHeight = 50;
 
     this.render();
@@ -23,11 +23,7 @@ export default class ColumnChart {
       </div>
       <div class="column-chart__container">
         <div data-element="header" class="column-chart__header">${this.getHeading()}</div>
-        <div data-element="body" class="column-chart__chart">
-      `
-        + this.getColumns() +
-      `
-        </div>
+        <div data-element="body" class="column-chart__chart">${this.getColumns()}</div>
       </div>
     `;
   }
@@ -59,9 +55,15 @@ export default class ColumnChart {
 
   getColumns() {
     let result = '';
+
+    if (!this.options.data) {
+      return result;
+    }
+
     this.getColumnProps(this.options.data).forEach(columnProps => {
       result += this.getColumn(columnProps);
     });
+
     return result;
   }
 
