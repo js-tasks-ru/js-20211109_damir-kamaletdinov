@@ -1,5 +1,4 @@
 export default class ColumnChart {
-
   constructor(params) {
     const defaultParams = {
       data: [],
