@@ -4,5 +4,14 @@
  * @returns {*[]} - the new array with uniq values
  */
 export function uniq(arr) {
-
+  if (!arr) {
+    return [];
+  }
+  let result = [];
+  arr.map(item => {
+    if (!result.includes(item)) {
+      result.push(item);
+    }
+  });
+  return result;
 }
