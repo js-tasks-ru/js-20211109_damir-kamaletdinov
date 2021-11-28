@@ -1,7 +1,6 @@
 export default class NotificationMessage {
 
-  static isExist = false;
-  static element;
+  static notification;
   static timer;
 
   constructor(text = '',
@@ -11,10 +10,6 @@ export default class NotificationMessage {
     } = {}
   ) {
 
-    if (NotificationMessage.isExist) {
-      this.remove();
-    }
-
     this.text = text,
     this.duration = duration;
     this.type = type;
@@ -22,21 +17,20 @@ export default class NotificationMessage {
     this.render();
   }
 
-  get element() {
-    return NotificationMessage.element;
-  }
-
   render() {
     const element = document.createElement("div");
     element.innerHTML = this.getTemplate();
-    NotificationMessage.element = element.firstElementChild;
+    this.element = element.firstElementChild;
   }
 
   show(container = document.body) {
-    NotificationMessage.isExist = true;
+    if (NotificationMessage.notification) {
+      NotificationMessage.notification.remove();
+    }
+    NotificationMessage.notification = this;
 
     this.container = container;
-    this.container.append(NotificationMessage.element);
+    this.container.append(this.element);
 
     NotificationMessage.timer = setTimeout(() => {
       this.remove();
@@ -44,8 +38,8 @@ export default class NotificationMessage {
   }
 
   remove() {
-    NotificationMessage.element.remove();
-    NotificationMessage.isExist = false;
+    this.element.remove();
+    NotificationMessage.notification = null;
     clearTimeout(NotificationMessage.timer);
   }
 
