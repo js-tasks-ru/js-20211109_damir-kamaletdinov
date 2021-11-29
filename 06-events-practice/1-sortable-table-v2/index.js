@@ -4,6 +4,7 @@ export default class SortableTable {
     sorted = {}
   } = {}) {
 
+
     this.isSortLocally = true;
     this.headerConfig = headersConfig;
     this.data = Array.isArray(data) ? data : data.data;
