@@ -33,14 +33,14 @@ export default class SortableTable {
   }
 
   addHandlers() {
-    this.subElements.sortControls.forEach(item => {
-      item.addEventListener('pointerdown', () => {
-        this.sortControlClicked(item);
-      });
-    });
+    this.subElements.header.addEventListener('pointerdown', this.sortControlClicked);
   }
 
-  sortControlClicked(item) {
+  sortControlClicked = (event) => {
+    const item = event.target.closest('[data-sortable="true"]');
+    if (!item) {
+      return;
+    }
     const sortField = item.dataset.id;
     const sortOrder = this.revertSortOrder(this.sortOrder);
     this.sort(sortField, sortOrder);
@@ -110,16 +110,13 @@ export default class SortableTable {
   }
 
   updateHeader() {
-    this.updateArrowPosition();
-  }
-
-  updateArrowPosition() {
-    this.subElements.sortControls.forEach((item) => {
+    const cells = this.subElements.header.children;
+    for (let item of cells) {
       if (item.dataset.sortable && item.dataset.id === this.sortField) {
         item.dataset.order = this.sortOrder;
         item.append(this.subElements.arrow);
       }
-    });
+    }
   }
 
   getSubElements() {
@@ -128,8 +125,6 @@ export default class SortableTable {
     dataElements.forEach((item) => {
       result[item.dataset.element] = item;
     });
-
-    result.sortControls = result.header.querySelectorAll('[data-sortable=\"true\"]');
 
     return result;
   }
