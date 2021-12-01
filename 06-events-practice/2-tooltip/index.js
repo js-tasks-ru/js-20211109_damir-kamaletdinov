@@ -4,9 +4,8 @@ class Tooltip {
   constructor() {
     if (Tooltip.tooltip) {
       return Tooltip.tooltip;
-    } else {
-      Tooltip.tooltip = this;
     }
+    Tooltip.tooltip = this;
   }
 
   render(text = '') {
@@ -17,7 +16,6 @@ class Tooltip {
   }
 
   initialize() {
-    this.elementsWithTip = this.getElementsWithTip();
     this.addHandler();
   }
 
@@ -27,32 +25,35 @@ class Tooltip {
   }
 
   destroy() {
+    document.body.removeEventListener('pointerover', this.pointerOverHandler);
+    document.body.removeEventListener('pointermove', this.pointerMoveHandler);
+    document.body.removeEventListener('pointerout', this.pointerOutHandler);
     this.remove();
   }
 
   addHandler() {
-    this.elementsWithTip.forEach(item => {
-      item.element.addEventListener('pointerover', this.pointerOverHandler);
-    });
+    document.body.addEventListener('pointerover', this.pointerOverHandler);
   }
 
   pointerOverHandler = (event) => {
-    if (event.relatedTarget && (event.target !== event.currentTarget)) {
+    const element = event.target.closest('[data-tooltip]');
+    if (!element) {
       return;
     }
+
     this.render();
     this.updatePosition(event.clientX, event.clientY);
 
     this.element.innerHTML = event.target.dataset.tooltip;
 
-    this.parent = event.target;
-    this.parent.addEventListener('pointermove', this.pointerMoveHandler);
-    this.parent.addEventListener('pointerout', this.pointerOutHandler);
+    document.body.addEventListener('pointermove', this.pointerMoveHandler);
+    document.body.addEventListener('pointerout', this.pointerOutHandler);
   }
 
-  pointerOutHandler = (event) => {
-    this.parent.removeEventListener('pointermove', this.pointerMoveHandler);
-    this.parent.removeEventListener('pointerout', this.pointerOutHandler);
+  pointerOutHandler = () => {
+    document.body.removeEventListener('pointermove', this.pointerMoveHandler);
+    document.body.removeEventListener('pointerout', this.pointerOutHandler);
+    console.log(this);
     this.remove();
   }
 
@@ -61,8 +62,9 @@ class Tooltip {
   }
 
   updatePosition(clientX, clientY) {
-    this.element.style.left = Math.ceil(clientX) + 4 + 'px';
-    this.element.style.top = Math.ceil(clientY) + 4 + 'px';
+    const shift = 4;
+    this.element.style.left = clientX + shift + 'px';
+    this.element.style.top = clientY + shift + 'px';
   }
 
   getElementsWithTip() {
